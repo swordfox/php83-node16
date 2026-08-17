@@ -4,6 +4,14 @@ on: [push, workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - node: 16.20.2
+            tag: 8.3-node16
+          - node: 11.15.0
+            tag: 8.3-node11
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
@@ -16,4 +24,6 @@ jobs:
           context: .
           platforms: linux/amd64
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/php:8.3-node16
+          build-args: |
+            NODE_VERSION=${{ matrix.node }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/php:${{ matrix.tag }}
